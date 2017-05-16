@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	var width   = window.innerWidth;
 	var height  = window.innerHeight;
 	var socket  = io.connect();
+	context.fillStyle = "black";
 
 	canvas.width = width;
 	canvas.height = height;
@@ -46,4 +47,10 @@ document.addEventListener("DOMContentLoaded", function() {
 		setTimeout(mainLoop, 25);
 	}
 	mainLoop();
+
+	function doKeyDown(e){
+		console.log(e);
+	}
+
+	window.addEventListener('keydown',doKeyDown,true);
 });
