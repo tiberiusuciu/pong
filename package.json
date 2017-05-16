@@ -1,18 +1,20 @@
 {
   "name": "pong",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "react": "^15.5.4",
-    "react-dom": "^15.5.4"
-  },
-  "devDependencies": {
-    "react-scripts": "0.9.5"
-  },
+  "version": "1.0.0",
+  "description": "multiplayer pong",
+  "main": "server.js",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
-  }
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tiberiusuciu/pong.git"
+  },
+  "author": "tiberiusuciu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tiberiusuciu/pong/issues"
+  },
+  "homepage": "https://github.com/tiberiusuciu/pong#readme"
 }
