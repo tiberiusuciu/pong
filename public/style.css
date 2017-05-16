@@ -9,3 +9,7 @@ body, html{
 #canvas {
    display: block;
 }
+
+#game {
+    background-color: #353535;
+}
