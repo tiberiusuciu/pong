@@ -1,11 +1,10 @@
 {
   "name": "pong",
   "version": "1.0.0",
-  "description": "multiplayer pong",
-  "main": "server.js",
+  "description": "Multiplayer Pong",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -16,5 +15,11 @@
   "bugs": {
     "url": "https://github.com/tiberiusuciu/pong/issues"
   },
-  "homepage": "https://github.com/tiberiusuciu/pong#readme"
+  "homepage": "https://github.com/tiberiusuciu/pong#readme",
+  "devDependencies": {
+    "express": "^4.15.2"
+  },
+  "dependencies": {
+    "socket.io": "^2.0.1"
+  }
 }
