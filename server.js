@@ -55,10 +55,17 @@ io.on('connection', function (socket) {
 
 		socket.on('paddle_v_move', function(data) {
 			console.log('Data', data);
+			io.emit('notify_v_moved', { player_id: data.player_id, new_y: data.new_y });
 		});
 
 		socket.on('paddle_h_move', function(data) {
 			console.log('Data', data);
+			io.emit('notify_h_moved', { player_id: data.player_id, new_x: data.new_x });
+		});
+
+		socket.on('ball_move', function(data) {
+			console.log('Data');
+			io.emit('ball_update', { x: data.x, y: data.y });
 		});
 	}
 	else {

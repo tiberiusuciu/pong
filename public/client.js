@@ -127,12 +127,6 @@ document.addEventListener("DOMContentLoaded", function() {
 			}
 		}
 
-		// if (this.keys.isPressed(40)) { // DOWN
-		//     this.p2.y = Math.min(this.height - this.p2.height, this.p2.y + 4);
-		// } else if (this.keys.isPressed(38)) { // UP
-		//     this.p2.y = Math.max(0, this.p2.y - 4);
-		// }
-
 		if (this.ball.vx > 0) {
 			if (this.p2.x <= this.ball.x + this.ball.width &&
 				this.p2.x > this.ball.x - this.ball.vx + this.ball.width) {
@@ -146,7 +140,8 @@ document.addEventListener("DOMContentLoaded", function() {
 						this.ball.vx = -this.ball.vx;
 					}
 				}
-			} else {
+			}
+			else {
 				if (this.p1.x + this.p1.width >= this.ball.x) {
 					var collisionDiff = this.p1.x + this.p1.width - this.ball.x;
 					var k = collisionDiff/-this.ball.vx;
@@ -221,8 +216,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 		Ball.prototype.update = function()
 		{
-			this.x += this.vx;
-			this.y += this.vy;
+			if(player_id == 0) {
+				this.x += this.vx;
+				this.y += this.vy;
+				socket.emit('ball_move', { x: this.x, y: this.y });
+			}
 		};
 
 		Ball.prototype.draw = function(p)
@@ -282,6 +280,33 @@ document.addEventListener("DOMContentLoaded", function() {
 			setTimeout(MainLoop, 33.3333);
 		}
 
+		socket.on('notify_v_moved', function (data) {
+			console.log("HELLO!");
+			if (data.player_id == 0) {
+				game.p1.y = data.new_y;
+			}
+			else if (data.player_id == 1) {
+				game.p2.y = data.new_y;
+			}
+		});
+
+		socket.on('notify_h_moved', function (data) {
+			console.log("HELLO!");
+			if (data.player_id == 2) {
+				game.p3.x = data.new_x;
+			}
+			else if (data.player_id == 3) {
+				game.p4.x = data.new_x;
+			}
+		});
+
+		socket.on('ball_update', function (data) {
+			console.log("BALL");
+			if(player_id != 0) {
+				game.ball.x = data.x;
+				game.ball.y = data.y;
+			}
+		});
 
 		// Start the game execution
 		MainLoop();
