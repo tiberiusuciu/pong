@@ -45,32 +45,25 @@ var clear_player_slot = (player_id) => {
 io.on('connection', function (socket) {
 	var player_id = give_player_id();
 	if(player_id != -1) {
-		console.log('NEW PLAYER CONNECTION ', player_id);
 		socket.emit('new_player', { player_id: player_id});
 
 		socket.on('disconnect', function() {
-			console.log('Got disconnect!');
 			clear_player_slot(player_id);
 		});
 
 		socket.on('paddle_v_move', function(data) {
-			console.log('Data', data);
 			io.emit('notify_v_moved', { player_id: data.player_id, new_y: data.new_y });
 		});
 
 		socket.on('paddle_h_move', function(data) {
-			console.log('Data', data);
 			io.emit('notify_h_moved', { player_id: data.player_id, new_x: data.new_x });
 		});
 
 		socket.on('ball_move', function(data) {
-			console.log('Data');
 			io.emit('ball_update', { x: data.x, y: data.y });
 		});
 	}
-	else {
-		console.log("player count full, you are now spectating");
-	}
+	// Player count full, the user will spectate
 });
 
 // var line_history = [];

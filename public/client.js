@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	socket.on('new_player', function (data) {
 		player_id = data.player_id;
-		console.log(player_id);
 		// Adding the paddle on the screen
 	});
 
@@ -228,7 +227,6 @@ document.addEventListener("DOMContentLoaded", function() {
 			p.fillRect(this.x, this.y, this.width, this.height);
 		};
 
-
 		//DISPLAY
 		function Display(x, y) {
 			this.x = x;
@@ -281,7 +279,6 @@ document.addEventListener("DOMContentLoaded", function() {
 		}
 
 		socket.on('notify_v_moved', function (data) {
-			console.log("HELLO!");
 			if (data.player_id == 0) {
 				game.p1.y = data.new_y;
 			}
@@ -291,7 +288,6 @@ document.addEventListener("DOMContentLoaded", function() {
 		});
 
 		socket.on('notify_h_moved', function (data) {
-			console.log("HELLO!");
 			if (data.player_id == 2) {
 				game.p3.x = data.new_x;
 			}
@@ -301,7 +297,6 @@ document.addEventListener("DOMContentLoaded", function() {
 		});
 
 		socket.on('ball_update', function (data) {
-			console.log("BALL");
 			if(player_id != 0) {
 				game.ball.x = data.x;
 				game.ball.y = data.y;
