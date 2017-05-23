@@ -1,6 +1,6 @@
 // http://blog.mailson.org/2013/02/simple-pong-game-using-html5-and-canvas/
 document.addEventListener("DOMContentLoaded", function() {
-	var player_id;
+	var player_id = 0;
 	var socket  = io.connect();
 	// Adding new player
 
@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		this.width = canvas.width;
 		this.height = canvas.height;
 		this.context = canvas.getContext("2d");
-		this.context.fillStyle = "white";
+		this.context.fillStyle = "#D00";
 		this.keys = new KeyListener();
 
 		// Player one
@@ -30,8 +30,12 @@ document.addEventListener("DOMContentLoaded", function() {
 		this.ball = new Ball();
 		this.ball.x = this.width/2;
 		this.ball.y = this.height/2;
-		this.ball.vy = Math.floor(Math.random()*12 - 6);
-		this.ball.vx = 7 - Math.abs(this.ball.vy);
+		console.log(player_id);
+		if(player_id == 0) {
+			this.ball.vy = Math.floor(Math.random()*12 - 6);
+			this.ball.vx = 7 - Math.abs(this.ball.vy);
+		}
+		socket.emit('ball_change', { vx: this.ball.vx, vy: this.ball.vy, x: this.ball.x, y: this.ball.y });
 		this.game_is_ready = false;
 	}
 
@@ -84,6 +88,7 @@ document.addEventListener("DOMContentLoaded", function() {
 					this.ball.x = this.p2.x - this.ball.width;
 					this.ball.y = Math.floor(this.ball.y - this.ball.vy + this.ball.vy*k);
 					this.ball.vx = -this.ball.vx;
+					socket.emit('ball_change', { vx: this.ball.vx, vy: this.ball.vy, x: this.ball.x, y: this.ball.y });
 				}
 			}
 		}
@@ -97,6 +102,7 @@ document.addEventListener("DOMContentLoaded", function() {
 					this.ball.x = this.p1.x + this.p1.width;
 					this.ball.y = Math.floor(this.ball.y - this.ball.vy + this.ball.vy*k);
 					this.ball.vx = -this.ball.vx;
+					socket.emit('ball_change', { vx: this.ball.vx, vy: this.ball.vy, x: this.ball.x, y: this.ball.y });
 				}
 			}
 		}
@@ -124,10 +130,13 @@ document.addEventListener("DOMContentLoaded", function() {
 			this.ball.y = this.height/2;
 
 			// set ball velocity
-			this.ball.vy = Math.floor(Math.random()*12 - 6);
-			this.ball.vx = 7 - Math.abs(this.ball.vy);
-			if (this.game_is_ready)
-			this.ball.vx *= -1;
+			console.log((this.game_is_ready && player_id == 0));
+			if (this.game_is_ready && player_id == 0) {
+				this.ball.vy = Math.floor(Math.random()*12 - 6);
+				this.ball.vx = 7 - Math.abs(this.ball.vy);
+				this.ball.vx *= -1;
+				socket.emit('ball_change', { vx: this.ball.vx, vy: this.ball.vy, x: this.ball.x, y: this.ball.y });
+			}
 		};
 
 		// PADDLE
@@ -163,7 +172,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			if(game.game_is_ready) {
 				this.x += this.vx;
 				this.y += this.vy;
-				socket.emit('ball_move', { x: this.x, y: this.y });
+				// socket.emit('ball_move', { x: this.x, y: this.y });
 			}
 		};
 
@@ -215,11 +224,12 @@ document.addEventListener("DOMContentLoaded", function() {
 		function MainLoop() {
 			game.update();
 			game.draw();
-			// Call the main loop again at a frame rate of 30fps
+			// Call the main loop again at a frame rate of 60fps
 			var frameCount = 1000/60;
 			setTimeout(MainLoop, frameCount);
 		}
 
+		// Socket connections
 		socket.on('notify_v_moved', function (data) {
 			if (data.player_id == 0) {
 				game.p1.y = data.new_y;
@@ -229,12 +239,12 @@ document.addEventListener("DOMContentLoaded", function() {
 			}
 		});
 
-		socket.on('ball_update', function (data) {
-			if(player_id != 1) {
-				game.ball.x = data.x;
-				game.ball.y = data.y;
-			}
-		});
+		// socket.on('ball_change', function (data) {
+		// 	if(player_id != 1) {
+		// 		game.ball.x = data.x;
+		// 		game.ball.y = data.y;
+		// 	}
+		// });
 
 		socket.on('game_is_ready', function (data) {
 			game.game_is_ready = data.game_is_ready;
@@ -242,6 +252,13 @@ document.addEventListener("DOMContentLoaded", function() {
 				game.p1.score = 0;
 				game.p2.score = 0;
 			}
+		});
+
+		socket.on('ball_changed', function (data) {
+			game.ball.vx = data.vx;
+			game.ball.vy = data.vy;
+			game.ball.x = data.x;
+			game.ball.y = data.y;
 		});
 
 		// Start the game execution

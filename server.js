@@ -52,6 +52,10 @@ io.on('connection', function (socket) {
 			io.emit('ball_update', { x: data.x, y: data.y });
 		});
 
+		socket.on('ball_change', function (data) {
+			socket.broadcast.emit('ball_changed', { vx: data.vx, vy: data.vy, x: data.x, y: data.y });
+		});
+
 		socket.on('score', function(date) {
 			io.emit('scored', { player: date.player });
 		});
