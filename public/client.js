@@ -27,166 +27,94 @@ document.addEventListener("DOMContentLoaded", function() {
 		this.p2.y = this.height/2 - this.p2.height/2;
 		this.display2 = new Display(this.width*7/8, 25);
 
-		// Player three
-		// this.p3 = new Paddle(5, 0, false);
-		// this.p3.x =  this.height/2 - this.p3.height/2 + this.p3.width/2;
-		// this.p3.y = this.height - 5 - 2;
-		// this.display3 = new Display(this.width/8, this.height - 25);
-
-		// Player four
-		// this.p4 = new Paddle(5, 0, false);
-		// this.p4.x = this.height/2 - this.p4.height/2 + this.p4.width/2;
-		// this.p4.y = 5;
-		// this.display4 = new Display(this.width*7/8, this.height - 25);
-
 		this.ball = new Ball();
 		this.ball.x = this.width/2;
 		this.ball.y = this.height/2;
 		this.ball.vy = Math.floor(Math.random()*12 - 6);
 		this.ball.vx = 7 - Math.abs(this.ball.vy);
+		this.game_is_ready = false;
 	}
 
 	Game.prototype.draw = function() {
 		this.context.clearRect(0, 0, this.width, this.height);
-		// this.context.fillRect(this.width/2 - 7, this.height/2 - 1, 14, 1)
-		// this.context.fillRect(this.width/2 - 1, this.height/2 - 7, 1, 14)
 		this.context.fillRect(this.width/2, 0, 2, this.height);
 
 		this.ball.draw(this.context);
 
 		this.p1.draw(this.context);
 		this.p2.draw(this.context);
-		// this.p3.draw(this.context);
-		// this.p4.draw(this.context);
 		this.display1.draw(this.context);
 		this.display2.draw(this.context);
-		// this.display3.draw(this.context);
-		// this.display4.draw(this.context);
 	};
 
 	Game.prototype.update = function() {
-		if (this.paused)
-			return;
-
 		this.ball.update();
 		this.display1.value = this.p1.score;
 		this.display2.value = this.p2.score;
-		// this.display3.value = this.p3.score;
-		// this.display4.value = this.p4.score;
-
-		// To which Y direction the paddle is moving
-		// if (player_id == 0 || player_id == 1) {
-			var new_y;
-			if (this.keys.isPressed(83)) { // DOWN
-				if (player_id == 0) {
-					new_y = Math.min(this.height - this.p1.height, this.p1.y + 8);
-					this.p1.y = new_y;
-				}
-				else if (player_id == 1) {
-					new_y = Math.min(this.height - this.p2.height, this.p2.y + 8);
-					this.p2.y = new_y;
-				}
-				socket.emit('paddle_v_move', { player_id: player_id, new_y: new_y });
-			} else if (this.keys.isPressed(87)) { // UP
-				if (player_id == 0) {
-					new_y = Math.max(0, this.p1.y - 8);
-					this.p1.y = new_y;
-				}
-				else if (player_id == 1) {
-					new_y = Math.max(0, this.p2.y - 8);
-					this.p2.y = new_y;
-				}
-				socket.emit('paddle_v_move', { player_id: player_id, new_y: new_y });
+		var new_y;
+		if (this.keys.isPressed(83)) { // DOWN
+			if (player_id == 0) {
+				new_y = Math.min(this.height - this.p1.height, this.p1.y + 8);
+				this.p1.y = new_y;
 			}
-		// }
-		// else if (player_id == 2 || player_id == 3) {
-		// 	var new_x;
-		// 	if (this.keys.isPressed(65)) { // Left
-		// 		if (player_id == 2) {
-		// 			new_x = Math.max(0, this.p3.x - 4);
-		// 			this.p3.x = new_x;
-		// 		}
-		// 		else if (player_id == 3) {
-		// 			new_x = Math.max(0, this.p4.x - 4);
-		// 			this.p4.x = new_x;
-		// 			socket.emit('paddle_h_move', { player_id: player_id, new_x: new_x });
-		// 		}
-		// 	} else if (this.keys.isPressed(68)) { // Right
-		// 		if (player_id == 2) {
-		// 			new_x = Math.min(this.width - this.p3.height, this.p3.x + 4);
-		// 			this.p3.x = new_x;
-		// 		}
-		// 		else if (player_id == 3) {
-		// 			new_x = Math.min(this.width - this.p4.height, this.p4.x + 4);
-		// 			this.p4.x = new_x;
-		// 		}
-		// 		socket.emit('paddle_h_move', { player_id: player_id, new_x: new_x });
-		// 	}
-		// }
+			else if (player_id == 1) {
+				new_y = Math.min(this.height - this.p2.height, this.p2.y + 8);
+				this.p2.y = new_y;
+			}
+			socket.emit('paddle_v_move', { player_id: player_id, new_y: new_y });
+		} else if (this.keys.isPressed(87)) { // UP
+			if (player_id == 0) {
+				new_y = Math.max(0, this.p1.y - 8);
+				this.p1.y = new_y;
+			}
+			else if (player_id == 1) {
+				new_y = Math.max(0, this.p2.y - 8);
+				this.p2.y = new_y;
+			}
+			socket.emit('paddle_v_move', { player_id: player_id, new_y: new_y });
+		}
 
 		if (this.ball.vx > 0) {
-			if (this.p2.x <= this.ball.x + this.ball.width &&
-				this.p2.x > this.ball.x - this.ball.vx + this.ball.width) {
-					var collisionDiff = this.ball.x + this.ball.width - this.p2.x;
-					var k = collisionDiff/this.ball.vx;
-					var y = this.ball.vy*k + (this.ball.y - this.ball.vy);
-					if (y >= this.p2.y && y + this.ball.height <= this.p2.y + this.p2.height) {
-						// collides with right paddle
-						this.ball.x = this.p2.x - this.ball.width;
-						this.ball.y = Math.floor(this.ball.y - this.ball.vy + this.ball.vy*k);
-						this.ball.vx = -this.ball.vx;
-					}
+			if (this.p2.x <= this.ball.x + this.ball.width && this.p2.x > this.ball.x - this.ball.vx + this.ball.width) {
+				var collisionDiff = this.ball.x + this.ball.width - this.p2.x;
+				var k = collisionDiff/this.ball.vx;
+				var y = this.ball.vy*k + (this.ball.y - this.ball.vy);
+				if (y >= this.p2.y && y + this.ball.height <= this.p2.y + this.p2.height) {
+					// collides with right paddle
+					this.ball.x = this.p2.x - this.ball.width;
+					this.ball.y = Math.floor(this.ball.y - this.ball.vy + this.ball.vy*k);
+					this.ball.vx = -this.ball.vx;
 				}
 			}
-			else {
-				if (this.p1.x + this.p1.width >= this.ball.x) {
-					var collisionDiff = this.p1.x + this.p1.width - this.ball.x;
-					var k = collisionDiff/-this.ball.vx;
-					var y = this.ball.vy*k + (this.ball.y - this.ball.vy);
-					if (y >= this.p1.y && y + this.ball.height <= this.p1.y + this.p1.height) {
-						// collides with the left paddle
-						this.ball.x = this.p1.x + this.p1.width;
-						this.ball.y = Math.floor(this.ball.y - this.ball.vy + this.ball.vy*k);
-						this.ball.vx = -this.ball.vx;
-					}
+		}
+		else {
+			if (this.p1.x + this.p1.width >= this.ball.x) {
+				var collisionDiff = this.p1.x + this.p1.width - this.ball.x;
+				var k = collisionDiff/-this.ball.vx;
+				var y = this.ball.vy*k + (this.ball.y - this.ball.vy);
+				if (y >= this.p1.y && y + this.ball.height <= this.p1.y + this.p1.height) {
+					// collides with the left paddle
+					this.ball.x = this.p1.x + this.p1.width;
+					this.ball.y = Math.floor(this.ball.y - this.ball.vy + this.ball.vy*k);
+					this.ball.vx = -this.ball.vx;
 				}
 			}
+		}
 
-		// if(this.ball.vy > 0) {
-		// 	if (this.p3.y >= this.ball.y + this.ball.height && this.p3.y < this.ball.y + this.ball.vy + this.ball.height) {
-		// 		if (this.ball.x + this.ball.width >= this.p3.x && this.ball.x <= 28 + this.p3.x) {
-		// 			this.ball.y = this.p3.y - this.ball.height;
-		// 			this.ball.vy = -this.ball.vy;
-		// 		}
-		// 	}
-		// }
-		// else {
-		// 	if (this.p4.y <= this.ball.y && this.p4.y > this.ball.y - this.ball.vy) {
-		// 		if (this.ball.x + this.ball.width >= this.p3.x && this.ball.x <= 28 + this.p3.x) {
-		// 			this.ball.y = this.p4.y;
-		// 			this.ball.vy = -this.ball.vy;
-		// 		}
-		// 	}
-		// }
+		// Top and bottom collision
+		if ((this.ball.vy < 0 && this.ball.y < 0) || (this.ball.vy > 0 && this.ball.y + this.ball.height > this.height)) {
+			this.ball.vy = -this.ball.vy;
+		}
 
-			// Top and bottom collision
-			if ((this.ball.vy < 0 && this.ball.y < 0) ||
-			(this.ball.vy > 0 && this.ball.y + this.ball.height > this.height)) {
-				this.ball.vy = -this.ball.vy;
-			}
-
-			if (this.ball.x >= this.width)
+		if (this.ball.x >= this.width) {
 			this.score(this.p1);
-			else if (this.ball.x + this.ball.width <= 0)
+		}
+		else if (this.ball.x + this.ball.width <= 0) {
 			this.score(this.p2);
-			// else if (this.ball.y + this.ball.height >= this.height)
-			// this.score(this.p3);
-			// else if (this.ball.y <= 0)
-			// this.score(this.p4);
-		};
+		}
+	};
 
-		Game.prototype.score = function(p)
-		{
+		Game.prototype.score = function(p) {
 			// player scores
 			p.score++;
 			var player = p == this.p1 ? 0 : 1;
@@ -198,7 +126,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			// set ball velocity
 			this.ball.vy = Math.floor(Math.random()*12 - 6);
 			this.ball.vx = 7 - Math.abs(this.ball.vy);
-			if (player == 0)
+			if (this.game_is_ready)
 			this.ball.vx *= -1;
 		};
 
@@ -212,8 +140,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			this.score = 0;
 		}
 
-		Paddle.prototype.draw = function(p)
-		{
+		Paddle.prototype.draw = function(p) {
 			if(this.is_vertical) {
 				p.fillRect(this.x, this.y, this.width, this.height);
 			}
@@ -232,17 +159,15 @@ document.addEventListener("DOMContentLoaded", function() {
 			this.height = 4;
 		}
 
-		Ball.prototype.update = function()
-		{
-			if(player_id == 1) {
+		Ball.prototype.update = function() {
+			if(game.game_is_ready) {
 				this.x += this.vx;
 				this.y += this.vy;
 				socket.emit('ball_move', { x: this.x, y: this.y });
 			}
 		};
 
-		Ball.prototype.draw = function(p)
-		{
+		Ball.prototype.draw = function(p) {
 			p.fillRect(this.x, this.y, this.width, this.height);
 		};
 
@@ -253,8 +178,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			this.value = 0;
 		}
 
-		Display.prototype.draw = function(p)
-		{
+		Display.prototype.draw = function(p) {
 			p.fillText(this.value, this.x, this.y);
 		};
 
@@ -274,13 +198,11 @@ document.addEventListener("DOMContentLoaded", function() {
 			document.addEventListener("keyup", this.keyup.bind(this));
 		}
 
-		KeyListener.prototype.isPressed = function(key)
-		{
+		KeyListener.prototype.isPressed = function(key) {
 			return this.pressedKeys[key] ? true : false;
 		};
 
-		KeyListener.prototype.addKeyPressListener = function(keyCode, callback)
-		{
+		KeyListener.prototype.addKeyPressListener = function(keyCode, callback) {
 			document.addEventListener("keypress", function(e) {
 				if (e.keyCode == keyCode)
 				callback(e);
@@ -307,15 +229,6 @@ document.addEventListener("DOMContentLoaded", function() {
 			}
 		});
 
-		// socket.on('notify_h_moved', function (data) {
-		// 	if (data.player_id == 2) {
-		// 		game.p3.x = data.new_x;
-		// 	}
-		// 	else if (data.player_id == 3) {
-		// 		game.p4.x = data.new_x;
-		// 	}
-		// });
-
 		socket.on('ball_update', function (data) {
 			if(player_id != 1) {
 				game.ball.x = data.x;
@@ -323,63 +236,14 @@ document.addEventListener("DOMContentLoaded", function() {
 			}
 		});
 
+		socket.on('game_is_ready', function (data) {
+			game.game_is_ready = data.game_is_ready;
+			if(!data.game_is_ready) {
+				game.p1.score = 0;
+				game.p2.score = 0;
+			}
+		});
+
 		// Start the game execution
 		MainLoop();
 });
-
-// document.addEventListener("DOMContentLoaded", function() {
-// 	var mouse = {
-// 		click: false,
-// 		move: false,
-// 		pos: {x:0, y:0},
-// 		pos_prev: false
-// 	};
-//
-// 	var canvas  = document.getElementById('drawing');
-// 	var context = canvas.getContext('2d');
-// 	var width   = window.innerWidth;
-// 	var height  = window.innerHeight;
-// 	var socket  = io.connect();
-// 	context.fillStyle = "black";
-//
-// 	canvas.width = width;
-// 	canvas.height = height;
-//
-// 	canvas.onmousedown = function(e){
-// 		mouse.click = true;
-// 	};
-// 	canvas.onmouseup = function(e){
-// 		mouse.click = false;
-// 	};
-//
-// 	canvas.onmousemove = function(e) {
-// 		mouse.pos.x = e.clientX / width;
-// 		mouse.pos.y = e.clientY / height;
-// 		mouse.move = true;
-// 	};
-//
-// 	socket.on('draw_line', function (data) {
-// 		var line = data.line;
-// 		context.beginPath();
-// 		context.lineWidth = 2;
-// 		context.moveTo(line[0].x * width, line[0].y * height);
-// 		context.lineTo(line[1].x * width, line[1].y * height);
-// 		context.stroke();
-// 	});
-//
-// 	function mainLoop() {
-// 		if (mouse.click && mouse.move && mouse.pos_prev) {
-// 			socket.emit('draw_line', { line: [ mouse.pos, mouse.pos_prev ] });
-// 			mouse.move = false;
-// 		}
-// 		mouse.pos_prev = {x: mouse.pos.x, y: mouse.pos.y};
-// 		setTimeout(mainLoop, 25);
-// 	}
-// 	mainLoop();
-//
-// 	function doKeyDown(e){
-// 		console.log(e);
-// 	}
-//
-// 	window.addEventListener('keydown',doKeyDown,true);
-// });
