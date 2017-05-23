@@ -55,12 +55,16 @@ io.on('connection', function (socket) {
 			io.emit('notify_v_moved', { player_id: data.player_id, new_y: data.new_y });
 		});
 
-		socket.on('paddle_h_move', function(data) {
-			io.emit('notify_h_moved', { player_id: data.player_id, new_x: data.new_x });
-		});
+		// socket.on('paddle_h_move', function(data) {
+		// 	io.emit('notify_h_moved', { player_id: data.player_id, new_x: data.new_x });
+		// });
 
 		socket.on('ball_move', function(data) {
 			io.emit('ball_update', { x: data.x, y: data.y });
+		});
+
+		socket.on('score', function(date) {
+			io.emit('scored', { player: date.player });
 		});
 	}
 	// Player count full, the user will spectate
