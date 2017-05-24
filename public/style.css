@@ -11,7 +11,6 @@ body, html{
 #game {
 		display: block;
     background-color: #EEE;
-		border: 2px solid black;
 		margin: 10% auto 0px auto;
 		vertical-align: middle;
 }
