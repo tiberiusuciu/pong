@@ -1,56 +1,145 @@
 document.addEventListener("DOMContentLoaded", function() {
-	var mouse = {
-		click: false,
-		move: false,
-		pos: {x:0, y:0},
-		pos_prev: false
+	var player_id = 0;
+
+	// Adding new player
+
+	// Setting up base game
+	function Game() {
+
+	}
+
+	// Presenting the canvas visually
+	Game.prototype.draw = function() {
+
 	};
 
-	var canvas  = document.getElementById('drawing');
-	var context = canvas.getContext('2d');
-	var width   = window.innerWidth;
-	var height  = window.innerHeight;
-	var socket  = io.connect();
-	context.fillStyle = "black";
+	// Setting up one frame lifecycle
+	Game.prototype.update = function() {
 
-	canvas.width = width;
-	canvas.height = height;
 
-	canvas.onmousedown = function(e){
-		mouse.click = true;
-	};
-	canvas.onmouseup = function(e){
-		mouse.click = false;
-	};
-
-	canvas.onmousemove = function(e) {
-		mouse.pos.x = e.clientX / width;
-		mouse.pos.y = e.clientY / height;
-		mouse.move = true;
-	};
-
-	socket.on('draw_line', function (data) {
-		var line = data.line;
-		context.beginPath();
-		context.lineWidth = 2;
-		context.moveTo(line[0].x * width, line[0].y * height);
-		context.lineTo(line[1].x * width, line[1].y * height);
-		context.stroke();
-	});
-
-	function mainLoop() {
-		if (mouse.click && mouse.move && mouse.pos_prev) {
-			socket.emit('draw_line', { line: [ mouse.pos, mouse.pos_prev ] });
-			mouse.move = false;
+		// Paddle movement
+		if (player_id >= 0) {
+			var new_y;
+			if (this.keys.isPressed(83)) { // DOWN
+				if (player_id == 0) {
+					new_y = Math.min(this.height - this.p1.height, this.p1.y + 8);
+					this.p1.y = new_y;
+				}
+				else if (player_id == 1) {
+					new_y = Math.min(this.height - this.p2.height, this.p2.y + 8);
+					this.p2.y = new_y;
+				}
+			}
 		}
-		mouse.pos_prev = {x: mouse.pos.x, y: mouse.pos.y};
-		setTimeout(mainLoop, 25);
-	}
-	mainLoop();
+/*
+		// Collision for paddles
+		if (this.ball.vx > 0) {
+			if (this.p2.x <= this.ball.x + this.ball.width && this.p2.x > this.ball.x - this.ball.vx + this.ball.width) {
+				var collisionDiff = this.ball.x + this.ball.width - this.p2.x;
+				var k = collisionDiff/this.ball.vx;
+				var y = this.ball.vy*k + (this.ball.y - this.ball.vy);
+				if (y >= this.p2.y && y + this.ball.height <= this.p2.y + this.p2.height) {
+					// collides with right paddle
+					this.ball.x = this.p2.x - this.ball.width;
+					this.ball.y = Math.floor(this.ball.y - this.ball.vy + this.ball.vy*k);
+					this.ball.vx = -this.ball.vx;
+				}
+			}
+		}
+		else {
+			if (this.p1.x + this.p1.width >= this.ball.x) {
+				var collisionDiff = this.p1.x + this.p1.width - this.ball.x;
+				var k = collisionDiff/-this.ball.vx;
+				var y = this.ball.vy*k + (this.ball.y - this.ball.vy);
+				if (y >= this.p1.y && y + this.ball.height <= this.p1.y + this.p1.height) {
+					// collides with the left paddle
+					this.ball.x = this.p1.x + this.p1.width;
+					this.ball.y = Math.floor(this.ball.y - this.ball.vy + this.ball.vy*k);
+					this.ball.vx = -this.ball.vx;
+				}
+			}
+		}
+*/
+		// Top and bottom collision
 
-	function doKeyDown(e){
-		console.log(e);
-	}
+		// Checking for scoring
+	};
 
-	window.addEventListener('keydown',doKeyDown,true);
+	// player scores
+		Game.prototype.score = function(p) {
+			// set ball position
+
+			// set ball velocity
+		};
+
+		// PADDLE
+		function Paddle(x, y) {
+
+		}
+
+		Paddle.prototype.draw = function(p) {
+			// displaying the paddle
+		};
+
+		// BALL
+		function Ball() {
+
+		}
+
+		Ball.prototype.update = function() {
+
+		};
+
+		Ball.prototype.draw = function(p) {
+			// Displaying the ball
+		};
+
+		//DISPLAY (Score)
+		function Display(x, y) {
+
+		}
+
+		Display.prototype.draw = function(p) {
+			// Displaying the score
+		};
+
+/*
+		// KEY LISTENER
+		function KeyListener() {
+			this.pressedKeys = [];
+
+			this.keydown = function(e) {
+				this.pressedKeys[e.keyCode] = true;
+			};
+
+			this.keyup = function(e) {
+				this.pressedKeys[e.keyCode] = false;
+			};
+
+			document.addEventListener("keydown", this.keydown.bind(this));
+			document.addEventListener("keyup", this.keyup.bind(this));
+		}
+
+		KeyListener.prototype.isPressed = function(key) {
+			return this.pressedKeys[key] ? true : false;
+		};
+
+		KeyListener.prototype.addKeyPressListener = function(keyCode, callback) {
+			document.addEventListener("keypress", function(e) {
+				if (e.keyCode == keyCode)
+				callback(e);
+			});
+		};
+*/
+
+		// Initialize our game instance
+
+		// Setting up the game lifecycle
+		function MainLoop() {
+			// Call the main loop again at a frame rate of 60fps
+		}
+
+		// Socket connections
+
+		// Start the game execution
 });
